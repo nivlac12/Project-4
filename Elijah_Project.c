@@ -127,8 +127,7 @@ void get_substrings(void *myID)
   {
     // printf("In get_subs\n");
     char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
-    char *longest;
-    char *full;
+    char longest[100];
     
     strcpy(first_line, &Everything[i*MAX_LINE_LENGTH]);
     strcpy(second_line, &Everything[(i+1)*MAX_LINE_LENGTH]);
