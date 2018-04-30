@@ -57,8 +57,11 @@ int main()
   z = 0;
   //fills the array sortedSubstring from Substrings
   sort(z,MAX_TEST);
-  printf("Longest substring: %s\n",sortedSubstring[MAX_TEST-2]);
+  printf("Longest substring: %s %d\n",sortedSubstring[MAX_TEST-2],MAX_TEST-2);
   printf("Checking for where longest substring is\n\n");
+  for(z = MAX_TEST-2; z>MAX_TEST-15; z--){
+    printf("String: %s\n\n Where we are at: %d\n\n",sortedSubstring[z],z);
+  }
  //print_results();
   printf("Shortest substring: %s\n",sortedSubstring[0]);
   return 0;
@@ -66,14 +69,12 @@ int main()
 
 void init_arrays()
 {
-  sortedSubstrings = (char **) malloc (MAX_LINES * sizeof(char *));
   Substrings = (char **) malloc (MAX_LINES * sizeof(char *));
   int i;
-  for(i = 0; i<100;i++)
+  for(i = 0; i<10;i++)
     {
       Everything[i*MAX_LINE_LENGTH]=0;
       Substrings[i] = malloc(MAX_LINE_LENGTH);
-      sortedSubstrings[i] = malloc(MAX_LINE_LENGTH);
     }
 }
 
@@ -157,7 +158,7 @@ void merging(int low, int mid, int high) {
   //comparisons of the two arrays and place the smaller inside of the
   //array sortedSubstrings to be printed later
   for(l1 = low, l2 = mid + 1, i = low; l1 <= mid && l2 <= high; i++) {
-    if(Substrings[l1] <= Substrings[l2])
+    if(strlen(Substrings[l1]) <= strlen(Substrings[l2]))
       sortedSubstring[i] = Substrings[l1++];
     else
       sortedSubstring[i] = Substrings[l2++];
