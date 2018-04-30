@@ -4,7 +4,7 @@
 
 #define MAX_LINES 1000000
 #define MAX_LINE_LENGTH 2020
-#define MAX_TEST 20
+#define MAX_TEST 1000000
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
@@ -59,10 +59,6 @@ int main()
   sort(z,MAX_TEST-1);
   printf("Longest substring: %s %d\n",Substrings[MAX_TEST-2],MAX_TEST-2);
   printf("Checking for where longest substring is\n\n");
-  for(z = MAX_TEST-2; z>MAX_TEST-20; z--){
-    printf("String: %s\n Where we are at: %d\n",Substrings[z],z);
-    printf("Check for what was there: %s\n\n",Substrings[z]);
-  }
  //print_results();
   printf("Shortest substring: %s\n",Substrings[0]);
   return 0;
