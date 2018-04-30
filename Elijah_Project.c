@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define MAX_LINES 50
+#define MAX_LINES 1000000
 #define MAX_LINE_LENGTH 2020
 #define MAX_TEST 1000000
-#define NUM_THREADS 8
+#define NUM_THREADS 16
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
@@ -16,7 +16,7 @@ short int table[MAX_LINE_LENGTH][MAX_LINE_LENGTH];
 int count = 0;
 
 void init_arrays();
-void get_substrings(int i);
+void get_substrings(void *);
 void print_results();
 void merge(int,int,int);
 void sort(int,int);
@@ -60,7 +60,7 @@ int main()
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 
     for (i = 0; i < NUM_THREADS; i++ ) {
-        rc = pthread_create(&threads[i], &attr, get_substrings, (void *)i);
+      rc = pthread_create(&threads[i], &attr, get_substrings, (void *)i);
         if (rc) {
           printf("ERROR; return code from pthread_create() is %d\n", rc);
           exit(-1);
@@ -118,14 +118,14 @@ void print_results()
   //printf("%s\n", Substrings[0]);
 }
 
-void get_substrings(int myId)
+void get_substrings(void *myID)
 {
+  int i, j, k, l, m, first_length, second_length;
   int startPos = ((int) myID) * (MAX_LINES / NUM_THREADS);
   int endPos = startPos + (MAX_LINES / NUM_THREADS);
-  for(int i = startPos; i<endPos; i++)
+  for(i = startPos; i<endPos; i++)
   {
     // printf("In get_subs\n");
-    int first_length, second_length, j, k, l,m;
     char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
     char *longest;
     
