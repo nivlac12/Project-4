@@ -69,7 +69,7 @@ void init_arrays()
   sortedSubstrings = (char **) malloc (MAX_LINES * sizeof(char *));
   Substrings = (char **) malloc (MAX_LINES * sizeof(char *));
   int i;
-  for(i = 0; i<10;i++)
+  for(i = 0; i<100;i++)
     {
       Everything[i*MAX_LINE_LENGTH]=0;
       Substrings[i] = malloc(MAX_LINE_LENGTH);
