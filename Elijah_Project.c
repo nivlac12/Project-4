@@ -4,13 +4,20 @@
 #include <pthread.h>
 
 #define MAX_LINES 1000000
-#define MAX_LINE_LENGTH 2020
+#define MAX_LINE_LENGTH 2001
 #define MAX_TEST 1000000
 #define NUM_THREADS 16
 
+struct substring
+{
+  char text[MAX_LINE_LENGTH];
+  char header[20];
+  int length;
+}
+
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
-char **Substrings; // [MAX_LINES];
-char **sortedSubstring; //[MAX_TEST];
+struct substring **Substrings; // [MAX_LINES];
+struct substring **sortedSubstring; //[MAX_TEST];
 short int table[MAX_LINE_LENGTH][MAX_LINE_LENGTH];
 
 int count = 0;
@@ -35,11 +42,11 @@ int main()
     {
       for(i=0;i < last_length; i++)
       {
-	line[i]='\0';
+	     line[i]='\0';
       }
       last_length=1;
       e=getc(fp);
-      for(i=0; e != '\n' && e!= EOF; i++)
+  for(i=0; e != '\n' && e!= EOF; i++)
 	{
 	  Everything[j*MAX_LINE_LENGTH+i] = e;
 	  e=getc(fp);
@@ -100,8 +107,8 @@ int main()
 
 void init_arrays()
 {
-  sortedSubstring = (char **) malloc (MAX_TEST * sizeof(char *));
-  Substrings =  (char **) malloc (MAX_LINES * sizeof(char *));
+  sortedSubstring = (struct substring **) malloc (MAX_TEST * sizeof(struct substring *));
+  Substrings =  (struct substring **) malloc (MAX_LINES * sizeof(struct substring *));
   int i;
   for(i = 0; i<MAX_LINES;i++)
     {
@@ -181,7 +188,9 @@ void get_substrings(void *myID)
   		}
   	   }
   	  // printf("%s\n\n\n",longest);
-  	  Substrings[i]=longest;
+  	  Substrings[i]->text=longest;
+      Substrings[i]->header = i + '-' + (i+1)+':';
+      Substrings[i]->length = strlen(longest);
   	  // free(longest);
   	}
     pthread_exit(NULL);
