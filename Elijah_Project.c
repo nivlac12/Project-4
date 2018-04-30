@@ -8,7 +8,7 @@
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
-char **sortedSubstring[MAX_TEST];
+char **sortedSubstring;
 
 void init_arrays();
 void get_substrings(int i);
@@ -71,7 +71,7 @@ void init_arrays()
 {
   Substrings = (char **) malloc (MAX_LINES * sizeof(char *));
   int i;
-  for(i = 0; i<10;i++)
+  for(i = 0; i<100;i++)
     {
       Everything[i*MAX_LINE_LENGTH]=0;
       Substrings[i] = malloc(MAX_LINE_LENGTH);
