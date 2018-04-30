@@ -4,10 +4,11 @@
 
 #define MAX_LINES 1000000
 #define MAX_LINE_LENGTH 2020
+#define MAX_TEST 100
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
-char **sortedSubstring[MAX_LINES];
+char **sortedSubstring[MAX_TEST];
 
 void init_arrays();
 void get_substrings(int i);
@@ -26,7 +27,7 @@ int main()
   int count = 1;
   char line[MAX_LINE_LENGTH];
 
-  for(j = 0; e!=EOF && j<100; j++)
+  for(j = 0; e!=EOF && j<=MAX_TEST; j++)
     {
       for(i=0;i < last_length; i++)
       {
@@ -49,17 +50,15 @@ int main()
   //This should be all we need to parallelize the first go  
   int z;
   //#pragma omp parallel for  
-  for(z = 0; z < MAX_LINES-2; z++){
+  for(z = 0; z < MAX_TEST-2; z++){
     get_substrings(z);
   }
+  printf("substrings ran this far%d\n\n", z);
   z = 0;
   //fills the array sortedSubstring from Substrings
-  sort(z,MAX_LINES);
-  printf("Longest substring: %s\n",sortedSubstring[MAX_LINES-3]);
+  sort(z,MAX_TEST);
+  printf("Longest substring: %s\n",sortedSubstring[MAX_TEST-2]);
   printf("Checking for where longest substring is\n\n");
-  for(z=MAX_LINES-4; z > MAX_LINES-10; z--){
-    printf("%s  $d\n\n",sortedSubstring[z],z);
-  }
  //print_results();
   printf("Shortest substring: %s\n",sortedSubstring[0]);
   return 0;
