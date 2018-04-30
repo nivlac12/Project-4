@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
 
-#define MAX_LINES 1000000
+#define MAX_LINES 50
 #define MAX_LINE_LENGTH 2020
 #define MAX_TEST 1000000
+#define NUM_THREADS 8
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
@@ -29,7 +31,7 @@ int main()
   int count = 1;
   char line[MAX_LINE_LENGTH];
 
-  for(j = 0; e!=EOF && j<MAX_TEST; j++)
+  for(j = 0; e!=EOF && j<MAX_LINES; j++)
     {
       for(i=0;i < last_length; i++)
       {
@@ -45,15 +47,46 @@ int main()
 	}
       count++;
     
-     }
-  //printf("\n\nCount=%d\n\n",count);
-  //This should be all we need to parallelize the first go  
+  }
+
+  int rc;
+  pthread_t threads[NUM_THREADS];
+  pthread_attr_t attr;
+  void *status;
+
+
+  /* Initialize and set thread detached attribute */
+  pthread_attr_init(&attr);
+  pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
+    for (i = 0; i < NUM_THREADS; i++ ) {
+        rc = pthread_create(&threads[i], &attr, get_substrings, (void *)i);
+        if (rc) {
+          printf("ERROR; return code from pthread_create() is %d\n", rc);
+          exit(-1);
+        }
+  }
+
+
+  pthread_attr_destroy(&attr);
+  for(i=0; i<NUM_THREADS; i++) {
+       rc = pthread_join(threads[i], &status);
+       if (rc) {
+       printf("ERROR; return code from pthread_join() is %d\n", rc);
+       exit(-1);
+       }
+  }
+
+  printf("%s\n", Substrings[0]);
+
+  pthread_exit(NULL);
+
   int z;
   //#pragma omp parallel for  
-  for(z = 0; z < 1000; z++){
+  /*for(z = 0; z < 10000; z++){
     get_substrings(z);
   }
-  /*
+  
   printf("substrings ran this far: %d\n\n", z);
   z = 0;
   //fills the array sortedSubstring from Substrings
@@ -70,7 +103,7 @@ void init_arrays()
   sortedSubstring = (char **) malloc (MAX_TEST * sizeof(char *));
   Substrings =  (char **) malloc (MAX_LINES * sizeof(char *));
   int i;
-  for(i = 0; i<MAX_TEST;i++)
+  for(i = 0; i<MAX_LINES;i++)
     {
       Everything[i*MAX_LINE_LENGTH]=0;
       Substrings[i] = malloc(MAX_LINE_LENGTH);
@@ -85,68 +118,73 @@ void print_results()
   //printf("%s\n", Substrings[0]);
 }
 
-void get_substrings(int i)
+void get_substrings(int myId)
 {
-  // printf("In get_subs\n");
-  int first_length, second_length, j, k, l,m;
-  char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
-  char *longest;
-  
-  strcpy(first_line, &Everything[i*MAX_LINE_LENGTH]);
-  strcpy(second_line, &Everything[(i+1)*MAX_LINE_LENGTH]);
-  first_length = strlen(first_line);
-  second_length = strlen(second_line);
-  //malloc is being dumb, we think it is because we are making it ahead of time
-  longest = (char *) malloc(MAX_LINE_LENGTH * sizeof(char));
-  // printf("lenfirs: %d\nlensec:%d\n",first_length, second_length);
-  table[first_length][second_length];
+  int startPos = ((int) myID) * (MAX_LINES / NUM_THREADS);
+  int endPos = startPos + (MAX_LINES / NUM_THREADS);
+  for(int i = startPos; i<endPos; i++)
+  {
+    // printf("In get_subs\n");
+    int first_length, second_length, j, k, l,m;
+    char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
+    char *longest;
+    
+    strcpy(first_line, &Everything[i*MAX_LINE_LENGTH]);
+    strcpy(second_line, &Everything[(i+1)*MAX_LINE_LENGTH]);
+    first_length = strlen(first_line);
+    second_length = strlen(second_line);
+    //malloc is being dumb, we think it is because we are making it ahead of time
+    longest = (char *) malloc(MAX_LINE_LENGTH * sizeof(char));
+    // printf("lenfirs: %d\nlensec:%d\n",first_length, second_length);
+    table[first_length][second_length];
 
-  //printf("table initialized\n");
-  //populate and initialize the matrix
-  for(j=0; j<second_length;j++)
-	{
-	  table[0][j]=0;
-	  //longest[j]=0;
-	}
-  for(k=0;k<first_length;k++)
-	{
-	  table[k][0]=0;
-	}
-      //Check to see through the two different lines to check for 
-      //if they are equal then we need to add 1 to the slot 
-      //to keep track of how long the common substring is
-  for(j=1;j<first_length;j++)
-	{
-	  for(k=1;k<second_length;k++)
-	    {
-	      if(first_line[j-1] == second_line[k-1])
-		{
-		  table[j][k]=table[j-1][k-1]+1;
-		}
-		else
-		  {
-		    table[j][k]=0;
-		  }
-	    }
-	}
-      // printf("Halfway through\n\n");
-      //now going through to retreive the longest substring
-      //iterate through the matrix to find the largest substring
-      //and move it to longest to set into the substrings array
-	  for(j=1;j<first_length;j++)
-	    {
-	      for(k=1;k<second_length;k++)
-		{
-		  if(table[j][k] > strlen(longest))
-		    {
-		      strncpy(longest, &first_line[j-table[j][k]], table[j][k]);
-		    }
-		}
-	   }
-	  // printf("%s\n\n\n",longest);
-	  Substrings[i]=longest;
-	  // free(longest);
-	  //}
+    //printf("table initialized\n");
+    //populate and initialize the matrix
+    for(j=0; j<second_length;j++)
+  	{
+  	  table[0][j]=0;
+  	  //longest[j]=0;
+  	}
+    for(k=0;k<first_length;k++)
+  	{
+  	  table[k][0]=0;
+  	}
+        //Check to see through the two different lines to check for 
+        //if they are equal then we need to add 1 to the slot 
+        //to keep track of how long the common substring is
+    for(j=1;j<first_length;j++)
+  	{
+  	  for(k=1;k<second_length;k++)
+  	    {
+  	      if(first_line[j-1] == second_line[k-1])
+  		{
+  		  table[j][k]=table[j-1][k-1]+1;
+  		}
+  		else
+  		  {
+  		    table[j][k]=0;
+  		  }
+  	    }
+  	}
+        // printf("Halfway through\n\n");
+        //now going through to retreive the longest substring
+        //iterate through the matrix to find the largest substring
+        //and move it to longest to set into the substrings array
+  	  for(j=1;j<first_length;j++)
+  	    {
+  	      for(k=1;k<second_length;k++)
+  		{
+  		  if(table[j][k] > strlen(longest))
+  		    {
+  		      strncpy(longest, &first_line[j-table[j][k]], table[j][k]);
+  		    }
+  		}
+  	   }
+  	  // printf("%s\n\n\n",longest);
+  	  Substrings[i]=longest;
+  	  // free(longest);
+  	}
+    pthread_exit(NULL);
 }
 
 void merging(int low, int mid, int high) {
