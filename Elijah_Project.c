@@ -9,6 +9,8 @@
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
 char **sortedSubstring; //[MAX_TEST];
+short int table[MAX_LINE_LENGTH][MAX_LINE_LENGTH];
+
 int count = 0;
 
 void init_arrays();
@@ -91,35 +93,30 @@ void get_substrings(int i)
   char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
   char *longest;
   
-  //for(i = 0; i<2; i++)
-  //{
-      //printf("%s\n: ", Everything[i*MAX_LINE_LENGTH]);
-      strcpy(first_line, &Everything[i*MAX_LINE_LENGTH]);
-      strcpy(second_line, &Everything[(i+1)*MAX_LINE_LENGTH]);
-      //printf("%s\n\n\n%s\n\n\n", first_line, second_line);
-      first_length = strlen(first_line);
-      second_length = strlen(second_line);
-      //malloc is being dumb, we think it is because we are making it ahead of time
-      longest = (char *) malloc(MAX_LINE_LENGTH * sizeof(char));
-      // printf("lenfirs: %d\nlensec:%d\n",first_length, second_length);
-      short int table[first_length][second_length];
-      //needs to be global
+  strcpy(first_line, &Everything[i*MAX_LINE_LENGTH]);
+  strcpy(second_line, &Everything[(i+1)*MAX_LINE_LENGTH]);
+  first_length = strlen(first_line);
+  second_length = strlen(second_line);
+  //malloc is being dumb, we think it is because we are making it ahead of time
+  longest = (char *) malloc(MAX_LINE_LENGTH * sizeof(char));
+  // printf("lenfirs: %d\nlensec:%d\n",first_length, second_length);
+  table[first_length][second_length];
 
-      //printf("table initialized\n");
-      //populate and initialize the matrix
-      for(j=0; j<second_length;j++)
+  //printf("table initialized\n");
+  //populate and initialize the matrix
+  for(j=0; j<second_length;j++)
 	{
 	  table[0][j]=0;
 	  //longest[j]=0;
 	}
-      for(k=0;k<first_length;k++)
+  for(k=0;k<first_length;k++)
 	{
 	  table[k][0]=0;
 	}
       //Check to see through the two different lines to check for 
       //if they are equal then we need to add 1 to the slot 
       //to keep track of how long the common substring is
-      for(j=1;j<first_length;j++)
+  for(j=1;j<first_length;j++)
 	{
 	  for(k=1;k<second_length;k++)
 	    {
