@@ -43,8 +43,6 @@ int main()
 	  e=getc(fp);
 	  last_length++;
 	}
-      //strcpy(&Everything[j*MAX_LINE_LENGTH], line);
-      //printf("%d\n\n", strlen(&Everything[j*MAX_LINE_LENGTH]));
       count++;
     
      }
@@ -52,9 +50,10 @@ int main()
   //This should be all we need to parallelize the first go  
   int z;
   //#pragma omp parallel for  
-  for(z = 0; z < MAX_TEST-2; z++){
+  for(z = 0; z < 1000; z++){
     get_substrings(z);
   }
+  /*
   printf("substrings ran this far: %d\n\n", z);
   z = 0;
   //fills the array sortedSubstring from Substrings
@@ -62,7 +61,7 @@ int main()
   printf("Longest substring: %s %d\n",Substrings[MAX_TEST-2],MAX_TEST-2);
   printf("Checking for where longest substring is\n\n");
  //print_results();
-  printf("Shortest substring: %s\n",Substrings[0]);
+  printf("Shortest substring: %s\n",Substrings[0]);*/
   return 0;
 }
 
