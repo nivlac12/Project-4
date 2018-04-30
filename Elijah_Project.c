@@ -4,11 +4,12 @@
 
 #define MAX_LINES 1000000
 #define MAX_LINE_LENGTH 2020
-#define MAX_TEST 100
+#define MAX_TEST 20
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
-char **sortedSubstring;
+char **sortedSubstring; //[MAX_TEST];
+int count = 0;
 
 void init_arrays();
 void get_substrings(int i);
@@ -19,7 +20,6 @@ void sort(int,int);
 int main()
 {
   init_arrays();
-  printf("Hello World\n");
   FILE *fp;
   int e,i,j, last_length = 0;
   char c;
@@ -27,7 +27,7 @@ int main()
   int count = 1;
   char line[MAX_LINE_LENGTH];
 
-  for(j = 0; e!=EOF && j<=MAX_TEST; j++)
+  for(j = 0; e!=EOF && j<MAX_TEST; j++)
     {
       for(i=0;i < last_length; i++)
       {
@@ -53,14 +53,15 @@ int main()
   for(z = 0; z < MAX_TEST-2; z++){
     get_substrings(z);
   }
-  printf("substrings ran this far%d\n\n", z);
+  printf("substrings ran this far: %d\n\n", z);
   z = 0;
   //fills the array sortedSubstring from Substrings
-  sort(z,MAX_TEST);
+  sort(z,MAX_TEST-1);
   printf("Longest substring: %s %d\n",sortedSubstring[MAX_TEST-2],MAX_TEST-2);
   printf("Checking for where longest substring is\n\n");
-  for(z = MAX_TEST-2; z>MAX_TEST-15; z--){
-    printf("String: %s\n\n Where we are at: %d\n\n",sortedSubstring[z],z);
+  for(z = MAX_TEST-2; z>MAX_TEST-20; z--){
+    printf("String: %s\n Where we are at: %d\n\n",sortedSubstring[z],z);
+    printf("Check for what was there %s\n\n",Substrings[z]);
   }
  //print_results();
   printf("Shortest substring: %s\n",sortedSubstring[0]);
@@ -69,12 +70,14 @@ int main()
 
 void init_arrays()
 {
-  Substrings = (char **) malloc (MAX_LINES * sizeof(char *));
+  sortedSubstring = (char **) malloc (MAX_TEST * sizeof(char *));
+  Substrings =  (char **) malloc (MAX_LINES * sizeof(char *));
   int i;
-  for(i = 0; i<100;i++)
+  for(i = 0; i<MAX_TEST;i++)
     {
       Everything[i*MAX_LINE_LENGTH]=0;
       Substrings[i] = malloc(MAX_LINE_LENGTH);
+      sortedSubstring[i] = malloc(MAX_LINE_LENGTH);
     }
 }
 
@@ -104,6 +107,8 @@ void get_substrings(int i)
       longest = (char *) malloc(MAX_LINE_LENGTH * sizeof(char));
       // printf("lenfirs: %d\nlensec:%d\n",first_length, second_length);
       short int table[first_length][second_length];
+      //needs to be global
+
       //printf("table initialized\n");
       //populate and initialize the matrix
       for(j=0; j<second_length;j++)
@@ -158,20 +163,22 @@ void merging(int low, int mid, int high) {
   //comparisons of the two arrays and place the smaller inside of the
   //array sortedSubstrings to be printed later
   for(l1 = low, l2 = mid + 1, i = low; l1 <= mid && l2 <= high; i++) {
+    printf("length of Substring[l1]: %d\n\nLine at location: %s\n\n",strlen(Substrings[l1]),Substrings[l1]);
+    printf("length of Substring[l2]: %d\n\nLine at location: %s\n\n",strlen(Substrings[l2]),Substrings[l2]);
     if(strlen(Substrings[l1]) <= strlen(Substrings[l2]))
       sortedSubstring[i] = Substrings[l1++];
     else
       sortedSubstring[i] = Substrings[l2++];
   }
-
+ 
   while(l1 <= mid) 
     sortedSubstring[i++] = Substrings[l1++];
 
   while(l2 <= high) 
     sortedSubstring[i++] = Substrings[l2++];
-
-  for(i = low; i <= high; i++)
-    sortedSubstring[i] = Substrings[i];
+  
+  // for(i = low; i <= high; i++)
+  //sortedSubstring[i] = Substrings[i];
 }
 
 void sort(int low, int high) {
@@ -179,10 +186,13 @@ void sort(int low, int high) {
   //recursively call sort to get down to two of the values then call merge
   if(low < high) {
     mid = (low + high) / 2;
+    // printf("before sort call in sort\n");
     sort(low, mid);
     sort(mid+1, high);
     merging(low, mid, high);
-  } else { 
+    printf("end of sort: %d\n",++count);    
+  }
+  else { 
     return;
   } 
 }
