@@ -127,7 +127,7 @@ void get_substrings(void *myID)
   {
     // printf("In get_subs\n");
     char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
-    char longest[100];
+    char *longest;
     
     strcpy(first_line, &Everything[i*MAX_LINE_LENGTH]);
     strcpy(second_line, &Everything[(i+1)*MAX_LINE_LENGTH]);
@@ -195,7 +195,7 @@ void merging(int low, int mid, int high) {
   for(l1 = low, l2 = mid + 1, i = low; l1 <= mid && l2 <= high; i++) {
     //printf("length of Substring[l1]: %d\n\nLine at location: %s\n\n",strlen(Substrings[l1]),Substrings[l1]);
     //printf("length of Substring[l2]: %d\n\nLine at location: %s\n\n",strlen(Substrings[l2]),Substrings[l2]);
-    if(strlen(Substrings[l1]) <= strlen(Substrings[l2]))
+    if(strlen(strchr(Substrings[l1],':')) <= strlen(strchr(Substrings[l2],':')))
       sortedSubstring[i] = Substrings[l1++];
     else
       sortedSubstring[i] = Substrings[l2++];
