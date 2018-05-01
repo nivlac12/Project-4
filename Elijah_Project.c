@@ -3,10 +3,9 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define MAX_LINES 160
+#define MAX_LINES 1000000
 #define MAX_LINE_LENGTH 2020
-#define MAX_TEST 1000000
-#define NUM_THREADS 1
+#define NUM_THREADS 16
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
@@ -31,7 +30,7 @@ int main()
   int count = 1;
   char line[MAX_LINE_LENGTH];
 
-  for(j = 0; e!=EOF && j<MAX_LINES; j++)
+  for(j = 0; e!=EOF; j++)
     {
       for(i=0;i < last_length; i++)
       {
@@ -78,29 +77,23 @@ int main()
   }
 
   printf("%s\n", Substrings[0]);
+  
+  sort(0,MAX_LINES-1);
+  printf("here\n");
+  print_results();
+  
 
   pthread_exit(NULL);
-
-  int z;
   //#pragma omp parallel for  
   /*for(z = 0; z < 10000; z++){
     get_substrings(z);
-  }
-  
-  printf("substrings ran this far: %d\n\n", z);
-  z = 0;
-  //fills the array sortedSubstring from Substrings
-  sort(z,MAX_TEST-1);
-  printf("Longest substring: %s %d\n",Substrings[MAX_TEST-2],MAX_TEST-2);
-  printf("Checking for where longest substring is\n\n");
- //print_results();
-  printf("Shortest substring: %s\n",Substrings[0]);*/
+    }*/
   return 0;
 }
 
 void init_arrays()
 {
-  sortedSubstring = (char **) malloc (MAX_TEST * sizeof(char *));
+  sortedSubstring = (char **) malloc (MAX_LINES * sizeof(char *));
   Substrings =  (char **) malloc (MAX_LINES * sizeof(char *));
   int i;
   for(i = 0; i<MAX_LINES;i++)
@@ -113,9 +106,12 @@ void init_arrays()
 
 void print_results()
 {
-  //printf("%s\n", &Everything[0]);
-  //printf("\n\n\n%s\n", &Everything[MAX_LINE_LENGTH*1]);
-  //printf("%s\n", Substrings[0]);
+  int i;
+  printf("here");
+  for(i=MAX_LINES-1; i>=0; i--)
+    {
+      printf("%s\n", Substrings[i]); 
+    }
 }
 
 void get_substrings(void *myID)
@@ -125,7 +121,6 @@ void get_substrings(void *myID)
   int endPos = startPos + (MAX_LINES / NUM_THREADS);
   for(i = startPos; i<endPos; i++)
   {
-    printf("Here\n");
     // printf("In get_subs\n");
     char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
     char *longest;
@@ -222,7 +217,7 @@ void sort(int low, int high) {
     sort(low, mid);
     sort(mid+1, high);
     merging(low, mid, high);
-    printf("end of sort: %d\n",++count);    
+    //printf("end of sort: %d\n",++count);    
   }
   else { 
     return;
