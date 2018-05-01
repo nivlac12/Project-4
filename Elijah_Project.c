@@ -3,10 +3,10 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-#define MAX_LINES 1000000
+#define MAX_LINES 160
 #define MAX_LINE_LENGTH 2020
 #define MAX_TEST 1000000
-#define NUM_THREADS 16
+#define NUM_THREADS 1
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
@@ -106,8 +106,8 @@ void init_arrays()
   for(i = 0; i<MAX_LINES;i++)
     {
       Everything[i*MAX_LINE_LENGTH]=0;
-      Substrings[i] = malloc(MAX_LINE_LENGTH);
-      sortedSubstring[i] = malloc(MAX_LINE_LENGTH);
+      Substrings[i] = malloc(MAX_LINE_LENGTH*sizeof(char));
+      sortedSubstring[i] = malloc(MAX_LINE_LENGTH*sizeof(char));
     }
 }
 
@@ -125,6 +125,7 @@ void get_substrings(void *myID)
   int endPos = startPos + (MAX_LINES / NUM_THREADS);
   for(i = startPos; i<endPos; i++)
   {
+    printf("Here\n");
     // printf("In get_subs\n");
     char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
     char *longest;
@@ -181,7 +182,7 @@ void get_substrings(void *myID)
   		}
   	   }
   	  // printf("%s\n\n\n",longest);
-  	  sprintf(Substrings[i], '%d-%d: %s', i, (i+1), longest);
+  	  sprintf(Substrings[i], "%d-%d: %s", i, (i+1), longest);
   	  // free(longest);
   	}
     pthread_exit(NULL);
