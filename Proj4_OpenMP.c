@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <pthread.h>
+#include <omp.h>
 
 #define MAX_LINES 1000000
 #define MAX_LINE_LENGTH 2020
-#define NUM_THREADS 16
+#define NUM_THREADS 8
 
 char Everything[MAX_LINES*MAX_LINE_LENGTH];
 char **Substrings; // [MAX_LINES];
@@ -15,7 +15,7 @@ short int table[MAX_LINE_LENGTH][MAX_LINE_LENGTH];
 int count = 0;
 
 void init_arrays();
-void get_substrings(void *);
+void get_substrings(void);
 void print_results();
 void merge(int,int,int);
 void sort(int,int);
@@ -29,8 +29,8 @@ int main()
   fp = fopen("/homes/dan/625/wiki_dump.txt","r");
   int count = 1;
   char line[MAX_LINE_LENGTH];
-
-  for(j = 0; e!=EOF; j++)
+  printf("a\n");
+  for(j = 0; e!=EOF && j < MAX_LINES; j++)
     {
       for(i=0;i < last_length; i++)
       {
@@ -46,14 +46,10 @@ int main()
 	}
       count++;
     
-  }
+    }
+  printf("here\n");
 
-  #pragma omp parallel
-  for(i = 0; i < NUM_THREADS; i++)
-  {
-    get_substrings(i);
-  }
-
+  get_substrings();
   printf("%s\n", Substrings[0]);
   
   sort(0,MAX_LINES-1);
@@ -90,17 +86,18 @@ void print_results()
     }
 }
 
-void get_substrings(void *myID)
+void get_substrings()
 {
   int i, j, k, l, m, first_length, second_length;
-  int startPos = ((int) myID) * (MAX_LINES / NUM_THREADS);
-  int endPos = startPos + (MAX_LINES / NUM_THREADS);
-  for(i = startPos; i<endPos; i++)
+  #pragma omp for private(i,j,k,l,m,first_length,second_length)
+  
+  for(i = 0; i<MAX_LINES-2; i++)
   {
+    //int i,j,k,l,m,first_length,second_length;
     // printf("In get_subs\n");
     char first_line[MAX_LINE_LENGTH], second_line[MAX_LINE_LENGTH];
     char *longest;
-    
+    //printf("insub\n");
     strcpy(first_line, &Everything[i*MAX_LINE_LENGTH]);
     strcpy(second_line, &Everything[(i+1)*MAX_LINE_LENGTH]);
     first_length = strlen(first_line);
@@ -108,8 +105,7 @@ void get_substrings(void *myID)
     //malloc is being dumb, we think it is because we are making it ahead of time
     longest = (char *) malloc(MAX_LINE_LENGTH * sizeof(char));
     // printf("lenfirs: %d\nlensec:%d\n",first_length, second_length);
-    table[first_length][second_length];
-
+    //printf("at first loop\n");
     //printf("table initialized\n");
     //populate and initialize the matrix
     for(j=0; j<second_length;j++)
@@ -152,11 +148,12 @@ void get_substrings(void *myID)
   		    }
   		}
   	   }
+	  //Substrings[i] = longest;
   	  // printf("%s\n\n\n",longest);
-  	  sprintf(Substrings[i], "%d-%d: %s", i, (i+1), longest);
+	  sprintf(Substrings[i], "%d-%d: %s", i, (i+1), longest);
+	  // printf("%s\n\n", Substrings[i]);
   	  // free(longest);
   	}
-    pthread_exit(NULL);
 }
 
 void merging(int low, int mid, int high) {
@@ -167,7 +164,8 @@ void merging(int low, int mid, int high) {
   for(l1 = low, l2 = mid + 1, i = low; l1 <= mid && l2 <= high; i++) {
     //printf("length of Substring[l1]: %d\n\nLine at location: %s\n\n",strlen(Substrings[l1]),Substrings[l1]);
     //printf("length of Substring[l2]: %d\n\nLine at location: %s\n\n",strlen(Substrings[l2]),Substrings[l2]);
-    if(strlen(strchr(Substrings[l1],':')) <= strlen(strchr(Substrings[l2],':')))
+  // if(strlen(strchr(Substrings[l1],':')) <= strlen(strchr(Substrings[l2],':')))
+    if(strlen(Substrings[l1]) <= strlen(Substrings[l2]))
       sortedSubstring[i] = Substrings[l1++];
     else
       sortedSubstring[i] = Substrings[l2++];
@@ -189,11 +187,12 @@ void sort(int low, int high) {
   //recursively call sort to get down to two of the values then call merge
   if(low < high) {
     mid = (low + high) / 2;
-    // printf("before sort call in sort\n");
+    //printf("before sort call in sort\n");
     sort(low, mid);
     sort(mid+1, high);
     merging(low, mid, high);
-    //printf("end of sort: %d\n",++count);    
+    //printf("done merging\n");
+    printf("end of sort: %d\n %s\n",++count,Substrings[count]);    
   }
   else { 
     return;

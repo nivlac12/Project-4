@@ -30,7 +30,7 @@ int main()
   int count = 1;
   char line[MAX_LINE_LENGTH];
 
-  for(j = 0; e!=EOF; j++)
+  for(j = 0; e!=EOF && j < MAX_LINES; j++)
     {
       for(i=0;i < last_length; i++)
       {
@@ -57,7 +57,7 @@ int main()
   /* Initialize and set thread detached attribute */
   pthread_attr_init(&attr);
   pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
+q
     for (i = 0; i < NUM_THREADS; i++ ) {
       rc = pthread_create(&threads[i], &attr, get_substrings, (void *)i);
         if (rc) {
@@ -108,7 +108,7 @@ void print_results()
 {
   int i;
   printf("here");
-  for(i=MAX_LINES-1; i>=0; i--)
+  for(i=MAX_LINES-1; i>=MAX_LINES-50; i--)
     {
       printf("%s\n", Substrings[i]); 
     }
